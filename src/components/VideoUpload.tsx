@@ -11,6 +11,11 @@ export default function VideoUpload() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!supabase) {
+      setUploadStatus('error');
+      setErrorMessage('未配置 Supabase：请先设置 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY');
+      return;
+    }
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -73,6 +78,15 @@ export default function VideoUpload() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8 px-4">
       <div className="w-full max-w-4xl mx-auto space-y-8">
+        {!supabase && (
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 text-sm text-amber-200">
+            <p className="font-medium mb-1">当前页面未连接 Supabase</p>
+            <p className="text-amber-200/80">
+              请在 GitHub 仓库 Secrets 中设置 <code>VITE_SUPABASE_URL</code> 和{' '}
+              <code>VITE_SUPABASE_ANON_KEY</code>，再重新部署。
+            </p>
+          </div>
+        )}
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">视频上传</h1>

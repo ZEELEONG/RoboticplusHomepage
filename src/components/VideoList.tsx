@@ -12,6 +12,7 @@ interface VideoFile {
 }
 
 export default function VideoList() {
+  const sb = supabase;
   const [videos, setVideos] = useState<VideoFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -21,9 +22,14 @@ export default function VideoList() {
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   const fetchVideos = async () => {
+    if (!sb) {
+      setVideos([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const { data, error } = await supabase.storage
+      const { data, error } = await sb.storage
         .from('videos')
         .list('', {
           limit: 100,
@@ -34,7 +40,7 @@ export default function VideoList() {
       if (error) throw error;
 
       // 获取所有视频的元数据
-      const { data: metadataList } = await supabase
+      const { data: metadataList } = await sb
         .from('video_metadata')
         .select('*');
 
@@ -44,7 +50,7 @@ export default function VideoList() {
       );
 
       const videoList: VideoFile[] = (data || []).map((file: any) => {
-        const { data: publicUrlData } = supabase.storage
+        const { data: publicUrlData } = sb.storage
           .from('videos')
           .getPublicUrl(file.name);
 
@@ -71,6 +77,18 @@ export default function VideoList() {
   useEffect(() => {
     fetchVideos();
   }, []);
+
+  if (!sb) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-slate-300 font-medium mb-2">未配置 Supabase</p>
+        <p className="text-slate-400 text-sm">
+          请在 GitHub 仓库 Secrets 中设置 <code className="text-slate-200">VITE_SUPABASE_URL</code> 和{' '}
+          <code className="text-slate-200">VITE_SUPABASE_ANON_KEY</code>，然后重新部署。
+        </p>
+      </div>
+    );
+  }
 
   const handleCopy = async (url: string, id: string) => {
     try {
@@ -100,14 +118,14 @@ export default function VideoList() {
     setDeletingId(id);
     try {
       // 删除存储中的文件
-      const { error } = await supabase.storage
+      const { error } = await sb.storage
         .from('videos')
         .remove([name]);
 
       if (error) throw error;
 
       // 删除数据库中的元数据
-      await supabase
+      await sb
         .from('video_metadata')
         .delete()
         .eq('storage_path', name);
@@ -131,7 +149,7 @@ export default function VideoList() {
     setReuploadingId(video.id);
     try {
       // 使用相同的文件名上传，upsert: true 会覆盖原文件
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await sb.storage
         .from('videos')
         .upload(video.name, file, {
           cacheControl: '3600',
@@ -141,7 +159,7 @@ export default function VideoList() {
       if (uploadError) throw uploadError;
 
       // 更新数据库中的元数据
-      const { error: metadataError } = await supabase
+      const { error: metadataError } = await sb
         .from('video_metadata')
         .update({
           original_filename: file.name,

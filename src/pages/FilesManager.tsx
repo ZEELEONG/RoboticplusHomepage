@@ -10,6 +10,10 @@ interface FileItem {
 }
 
 export default function FilesManager() {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
+
   const [files, setFiles] = useState<FileItem[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
@@ -17,16 +21,18 @@ export default function FilesManager() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) return;
     loadFiles(currentPath);
   }, [currentPath]);
 
   const loadFiles = async (path: string) => {
+    if (!isSupabaseConfigured) return;
     setIsLoading(true);
     try {
-      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/file-manager?path=${encodeURIComponent(path)}`;
+      const apiUrl = `${supabaseUrl}/functions/v1/file-manager?path=${encodeURIComponent(path)}`;
       const response = await fetch(apiUrl, {
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${supabaseAnonKey}`,
         }
       });
       if (!response.ok) throw new Error('Failed to load files');
@@ -42,16 +48,17 @@ export default function FilesManager() {
 
   const deleteSelectedFiles = async () => {
     if (selectedFiles.size === 0) return;
+    if (!isSupabaseConfigured) return;
 
     if (!confirm(`确定要删除 ${selectedFiles.size} 个文件吗？此操作不可恢复！`)) return;
 
     try {
       const filesToDelete = Array.from(selectedFiles);
-      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/file-manager/delete`;
+      const apiUrl = `${supabaseUrl}/functions/v1/file-manager/delete`;
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${supabaseAnonKey}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ files: filesToDelete })
@@ -70,6 +77,10 @@ export default function FilesManager() {
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
     if (!fileList || fileList.length === 0) return;
+    if (!isSupabaseConfigured) {
+      alert('未配置 Supabase：请先设置 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY');
+      return;
+    }
 
     const formData = new FormData();
     formData.append('path', currentPath);
@@ -79,11 +90,11 @@ export default function FilesManager() {
     }
 
     try {
-      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/file-manager/upload`;
+      const apiUrl = `${supabaseUrl}/functions/v1/file-manager/upload`;
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${supabaseAnonKey}`,
         },
         body: formData
       });
@@ -106,6 +117,10 @@ export default function FilesManager() {
 
     const droppedFiles = Array.from(e.dataTransfer.files);
     if (droppedFiles.length === 0) return;
+    if (!isSupabaseConfigured) {
+      alert('未配置 Supabase：请先设置 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY');
+      return;
+    }
 
     const formData = new FormData();
     formData.append('path', currentPath);
@@ -115,11 +130,11 @@ export default function FilesManager() {
     });
 
     try {
-      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/file-manager/upload`;
+      const apiUrl = `${supabaseUrl}/functions/v1/file-manager/upload`;
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${supabaseAnonKey}`,
         },
         body: formData
       });
@@ -134,11 +149,15 @@ export default function FilesManager() {
   };
 
   const downloadFile = async (filePath: string, fileName: string) => {
+    if (!isSupabaseConfigured) {
+      alert('未配置 Supabase：请先设置 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY');
+      return;
+    }
     try {
-      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/file-manager/download?path=${encodeURIComponent(filePath)}`;
+      const apiUrl = `${supabaseUrl}/functions/v1/file-manager/download?path=${encodeURIComponent(filePath)}`;
       const response = await fetch(apiUrl, {
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${supabaseAnonKey}`,
         }
       });
       if (!response.ok) throw new Error('Failed to download file');
@@ -213,6 +232,15 @@ export default function FilesManager() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-8">
       <div className="max-w-7xl mx-auto">
+        {!isSupabaseConfigured && (
+          <div className="mb-6 bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 text-sm text-amber-200">
+            <p className="font-medium mb-1">未配置 Supabase</p>
+            <p className="text-amber-200/80">
+              请在 GitHub 仓库 Secrets 中设置 <code>VITE_SUPABASE_URL</code> 和{' '}
+              <code>VITE_SUPABASE_ANON_KEY</code>，再重新部署。
+            </p>
+          </div>
+        )}
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">文件管理器</h1>
           <p className="text-slate-400">管理项目文件 (Supabase Storage)</p>

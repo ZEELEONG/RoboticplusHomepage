@@ -5,11 +5,9 @@ import { useState } from 'react';
 export default function Download() {
   const [showInstructions, setShowInstructions] = useState(false);
 
-  const { data } = supabase.storage
-    .from('downloads')
-    .getPublicUrl('project-source.zip');
-
-  const downloadUrl = data.publicUrl;
+  const downloadUrl = supabase
+    ? supabase.storage.from('downloads').getPublicUrl('project-source.zip').data.publicUrl
+    : '';
 
   const copyCommand = () => {
     navigator.clipboard.writeText('node create-download-package.js');
@@ -44,7 +42,15 @@ export default function Download() {
             <a
               href={downloadUrl}
               download="project-source.zip"
-              className="w-full px-6 py-4 bg-gradient-to-r from-[#f5af15] to-[#f5af15] rounded-xl font-semibold flex items-center justify-center space-x-2 hover:scale-105 transition-transform duration-300 shadow-lg shadow-[#f5af15]/50"
+              className={`w-full px-6 py-4 rounded-xl font-semibold flex items-center justify-center space-x-2 transition-transform duration-300 shadow-lg ${
+                supabase
+                  ? 'bg-gradient-to-r from-[#f5af15] to-[#f5af15] hover:scale-105 shadow-[#f5af15]/50'
+                  : 'bg-slate-700 cursor-not-allowed opacity-60 shadow-transparent'
+              }`}
+              aria-disabled={!supabase}
+              onClick={(e) => {
+                if (!supabase) e.preventDefault();
+              }}
             >
               <DownloadIcon className="w-5 h-5" />
               <span>下载 project-source.zip</span>
@@ -101,6 +107,16 @@ export default function Download() {
                   <strong>提示：</strong>这个操作需要在开发环境中执行，确保你有 Node.js 和项目依赖已安装。
                 </p>
               </div>
+            </div>
+          )}
+
+          {!supabase && (
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 text-left text-sm text-amber-200">
+              <p className="font-semibold mb-1">未配置 Supabase，下载链接不可用</p>
+              <p className="text-amber-200/80">
+                请在 GitHub 仓库 Secrets 中设置 <code>VITE_SUPABASE_URL</code> 和{' '}
+                <code>VITE_SUPABASE_ANON_KEY</code>，再重新部署。
+              </p>
             </div>
           )}
 
