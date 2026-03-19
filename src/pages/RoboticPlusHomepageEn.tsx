@@ -423,10 +423,10 @@ export default function RoboticPlusHomepageEn() {
             <div className="space-y-6">
               <h3 className="text-3xl font-bold [color:#f5af15]">RoboticPlus.AI</h3>
               <p className="text-gray-300 leading-relaxed text-lg">
-                RoboticPlus is a technology company that provides integrated software and hardware intelligent systems for a wide range of robot configurations in the industrial world, founded by one of the earliest Chinese teams globally to develop data model-driven adaptive robot technology on leading CAD platforms.
+              ROBOTICPLUS.AI is a technology company delivering intelligent systems for industrial manufacturing. Founded by one of the earliest Chinese teams to pioneer data-model-driven adaptive robotics on leading CAD platforms, the company specializes in high-mix, low-volume production across industries including shipbuilding, electric power, engineering machinery, and steel structures.
               </p>
               <p className="text-gray-300 leading-relaxed text-lg">
-                Targeting mass customization industries, RoboticPlus has provided trusted hand-eye-brain coordinated robot flexible manufacturing high-end equipment to hundreds of well-known enterprises globally in shipbuilding, power, construction, construction machinery and other fields through its independently developed industrial software platform RoBIM, covering processes including cutting, welding, grinding, and assembly.
+              Powered by its proprietary RoBIM platform, our robotic systems perceive, plan, and adapt in real time, handling cutting, welding, grinding, and assembly with precision, flexibility, and scalability, enabling hundreds of leading companies worldwide to achieve intelligent, efficient automation.
               </p>
             </div>
 

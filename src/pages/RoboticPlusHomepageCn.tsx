@@ -58,7 +58,7 @@ export default function RoboticPlusHomepageCn() {
           titleComponent={
             <div className="relative z-10">
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-white via-[#f5af15] to-[#f5af15] bg-clip-text text-transparent">
-                <div>构建工业世界的</div>
+                <div>致力于构建工业世界的</div>
                 <div>智能机器人系统</div>
               </h1>
               <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-6 md:mb-8 leading-relaxed">
