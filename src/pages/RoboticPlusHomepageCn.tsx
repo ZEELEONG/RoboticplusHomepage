@@ -82,7 +82,7 @@ export default function RoboticPlusHomepageCn() {
             </div>
           }
           frameCount={120}
-          frameBasePath="/hero imgae animated3"
+          frameBasePath={`${import.meta.env.BASE_URL}hero imgae animated3`}
           frameStart={3000}
         />
       </section>
@@ -131,7 +131,7 @@ export default function RoboticPlusHomepageCn() {
           <div className="absolute inset-0 z-0">
             <img
               key={isMobile ? 'mobile-fullstack' : 'desktop-fullstack'}
-              src={isMobile ? "/HD_mobile_v2.png" : "/solutions.png"}
+              src={isMobile ? `${import.meta.env.BASE_URL}HD_mobile_v2.png` : `${import.meta.env.BASE_URL}solutions.png`}
               alt="Solutions Background"
               className="absolute left-0 top-0 w-full min-h-full opacity-100"
               style={{ objectFit: 'cover', objectPosition: 'center' }}

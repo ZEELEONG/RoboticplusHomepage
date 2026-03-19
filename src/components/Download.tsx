@@ -121,7 +121,7 @@ export default function Download() {
           )}
 
           <a
-            href="/"
+            href={import.meta.env.BASE_URL}
             className="block text-sm text-gray-400 hover:text-[#f5af15] transition-colors"
           >
             返回首页
