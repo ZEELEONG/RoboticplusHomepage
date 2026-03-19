@@ -117,7 +117,7 @@ export default function RoboticPlusHomepageCn() {
                   as="h2"
                 />
                 <BlurIn
-                  word="仿真及生产，模块化微服务架构，百万+原生高精度工业数据驱动，群脑智能协作，手眼脑毫米级精度。"
+                  word="仿真即生产，模块化微服务架构，百万+原生高精度工业数据驱动，群脑智能协作，手眼脑毫米级精度。"
                   className="text-base md:text-xl text-gray-200 leading-relaxed max-w-3xl font-normal text-left"
                   duration={1.5}
                   as="p"
