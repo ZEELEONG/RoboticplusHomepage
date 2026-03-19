@@ -142,7 +142,7 @@ export default function RoboticPlusHomepageEn() {
             <div className="relative inline-block">
               <div className="absolute inset-0 -inset-x-8 -inset-y-6 bg-gradient-to-br from-black/80 via-black/70 to-black/80 rounded-3xl blur-2xl" />
               <div className="relative">
-                <Brain className="w-12 h-12 md:w-16 md:h-16 [color:#f5af15] mb-4 animate-pulse" />
+                <Settings className="w-12 h-12 md:w-16 md:h-16 [color:#f5af15] mb-4 animate-pulse" />
                 <BlurIn
                   word='Full-Stack Advanced Robotic Equipment, Empowering Industries with Mass Customization'
                   className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-[#f5af15] to-white bg-clip-text text-transparent text-left"
@@ -179,7 +179,7 @@ export default function RoboticPlusHomepageEn() {
               <div className="relative inline-block">
                 <div className="absolute inset-0 -inset-x-8 -inset-y-6 bg-gradient-to-br from-black/80 via-black/70 to-black/80 rounded-3xl blur-2xl" />
                 <div className="relative">
-                  <Settings className="w-12 h-12 md:w-16 md:h-16 [color:#f5af15] mb-4 animate-pulse" />
+                  <Cpu className="w-12 h-12 md:w-16 md:h-16 [color:#f5af15] mb-4 animate-pulse" />
                   <BlurIn
                     word="Process Modules"
                     className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-[#f5af15] to-white bg-clip-text text-transparent text-left"
@@ -336,7 +336,7 @@ export default function RoboticPlusHomepageEn() {
             <div className="relative inline-block">
               <div className="absolute inset-0 -inset-x-8 -inset-y-6 bg-gradient-to-br from-black/80 via-black/70 to-black/80 rounded-3xl blur-2xl" />
               <div className="relative">
-                <Cpu className="w-12 h-12 md:w-16 md:h-16 [color:#f5af15] mb-4 animate-pulse" />
+                <Brain className="w-12 h-12 md:w-16 md:h-16 [color:#f5af15] mb-4 animate-pulse" />
                 <BlurIn
                   word="The Evolution of Artisan: RoboticPlus.AI Unveils Industrial Humanoid Robotics"
                   className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-[#f5af15] to-white bg-clip-text text-transparent text-left"
