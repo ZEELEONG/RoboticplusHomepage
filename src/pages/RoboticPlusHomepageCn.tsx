@@ -520,11 +520,11 @@ export default function RoboticPlusHomepageCn() {
                     </div>
                     <div>
                       <h4 className="text-base font-semibold text-white mb-2">商务合作</h4>
-                      <p className="text-gray-300 text-sm">business@roboticplus.ai</p>
+                      <p className="text-gray-300 text-sm">public@roboticplus.com</p>
                       <h4 className="text-base font-semibold text-white mb-2">媒体对接</h4>
-                      <p className="text-gray-300 text-sm">invest@roboticplus.ai</p>
+                      <p className="text-gray-300 text-sm">xin_lu@roboticplus.com</p>
                       <h4 className="text-base font-semibold text-white mb-2">人才招聘</h4>
-                      <p className="text-gray-300 text-sm">tech@roboticplus.ai</p>
+                      <p className="text-gray-300 text-sm">careers@roboticplus.com</p>
                     </div>
                   </div>
                 </div>
