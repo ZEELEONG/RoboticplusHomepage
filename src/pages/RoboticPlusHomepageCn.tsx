@@ -520,11 +520,11 @@ export default function RoboticPlusHomepageCn() {
                     </div>
                     <div>
                       <h4 className="text-base font-semibold text-white mb-2">商务合作</h4>
-                      <p className="text-gray-300 text-sm">public@roboticplus.com</p>
+                      <p className="text-gray-300 text-sm pb-[10px]">public@roboticplus.com</p>
                       <h4 className="text-base font-semibold text-white mb-2">媒体对接</h4>
-                      <p className="text-gray-300 text-sm">xin_lu@roboticplus.com</p>
+                      <p className="text-gray-300 text-sm pb-[10px]">xin_lu@roboticplus.com</p>
                       <h4 className="text-base font-semibold text-white mb-2">人才招聘</h4>
-                      <p className="text-gray-300 text-sm">careers@roboticplus.com</p>
+                      <p className="text-gray-300 text-sm pb-[10px]">careers@roboticplus.com</p>
                     </div>
                   </div>
                 </div>
@@ -536,8 +536,8 @@ export default function RoboticPlusHomepageCn() {
                     </div>
                     <div>
                       <h4 className="text-base font-semibold text-white mb-1">公司地址</h4>
-                      <p className="text-gray-300">公司总部：上海市宝山区逸仙路 3000 号 2 号楼 1 层</p>
-                      <p className="text-gray-300">智能工厂：上海市宝山区长江西路 850 号 11 号楼</p>
+                      <p className="text-gray-300 text-sm pb-[10px]">公司总部：上海市宝山区逸仙路 3000 号 2 号楼 1 层</p>
+                      <p className="text-gray-300 text-sm pb-[10px]">智能工厂：上海市宝山区长江西路 850 号 11 号楼</p>
                     </div>
                   </div>
                 </div>

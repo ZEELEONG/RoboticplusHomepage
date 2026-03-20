@@ -520,11 +520,11 @@ export default function RoboticPlusHomepageEn() {
                     </div>
                     <div>
                       <h4 className="text-base font-semibold text-white mb-2">Business Cooperation</h4>
-                      <p className="text-gray-300 text-sm">public@roboticplus.com</p>
+                      <p className="text-gray-300 text-sm pb-[10px]">public@roboticplus.com</p>
                       <h4 className="text-base font-semibold text-white mb-2">Media Contact</h4>
-                      <p className="text-gray-300 text-sm">xin_lu@roboticplus.com</p>
+                      <p className="text-gray-300 text-sm pb-[10px]">xin_lu@roboticplus.com</p>
                       <h4 className="text-base font-semibold text-white mb-2">Talent Recruitment</h4>
-                      <p className="text-gray-300 text-sm">careers@roboticplus.com</p>
+                      <p className="text-gray-300 text-sm pb-[10px]">careers@roboticplus.com</p>
                     </div>
                   </div>
                 </div>
@@ -536,8 +536,8 @@ export default function RoboticPlusHomepageEn() {
                     </div>
                     <div>
                       <h4 className="text-base font-semibold text-white mb-1">Company Address</h4>
-                      <p className="text-gray-300">Headquarters: Floor 1, Building 2, No. 3000 Yixian Road, Baoshan District, Shanghai</p>
-                      <p className="text-gray-300">Smart Factory: Building 11, No. 850 Changjiang West Road, Baoshan District, Shanghai</p>
+                      <p className="text-gray-300 text-sm pb-[10px]">Headquarters: Floor 1, Building 2, No. 3000 Yixian Road, Baoshan District, Shanghai</p>
+                      <p className="text-gray-300 text-sm pb-[10px]">Smart Factory: Building 11, No. 850 Changjiang West Road, Baoshan District, Shanghai</p>
                     </div>
                   </div>
                 </div>
