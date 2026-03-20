@@ -17,7 +17,7 @@ export default function RoboticPlusHomepageCn() {
     const handleScroll = () => {
       setScrollY(window.scrollY);
 
-      const videoSection = document.getElementById('video-section');
+      const videoSection = document.getElementById('data');
       if (videoSection) {
         const videoSectionTop = videoSection.getBoundingClientRect().top;
         setShowScrollTop(videoSectionTop <= 0);
@@ -41,8 +41,12 @@ export default function RoboticPlusHomepageCn() {
   };
 
   const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
+
+  const heroVideoSrc = `${import.meta.env.BASE_URL}hero imgae animated3.mp4`;
+  const mobileSolutionsImageSrc = `${import.meta.env.BASE_URL}HD_mobile_v2.png`;
+  const desktopSolutionsImageSrc = `${import.meta.env.BASE_URL}solutions.png`;
 
   return (
     <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
@@ -66,7 +70,7 @@ export default function RoboticPlusHomepageCn() {
               </p>
               <div className="flex flex-row gap-3 sm:gap-4 justify-center">
                 <button
-                  onClick={() => scrollToSection('video-section')}
+                  onClick={() => scrollToSection('data')}
                   className="group px-4 py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-[#f5af15] to-[#f5af15] rounded-full font-semibold flex items-center justify-center space-x-2 hover:scale-105 transition-transform duration-300 shadow-lg shadow-[#f5af15]/50 text-sm md:text-sm whitespace-nowrap"
                 >
                   <span>了解更多</span>
@@ -81,13 +85,11 @@ export default function RoboticPlusHomepageCn() {
               </div>
             </div>
           }
-          frameCount={120}
-          frameBasePath={`${import.meta.env.BASE_URL}hero imgae animated3`}
-          frameStart={3000}
+          videoSrc={heroVideoSrc}
         />
       </section>
 
-      <section id="video-section" className="relative">
+      <section id="data" className="relative min-h-screen">
         <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
             <video
@@ -117,7 +119,7 @@ export default function RoboticPlusHomepageCn() {
                   as="h2"
                 />
                 <BlurIn
-                  word="仿真即生产，模块化微服务架构，百万+原生高精度工业数据驱动，群脑智能协作，手眼脑毫米级精度。"
+                  word="仿真及生产，模块化微服务架构，百万+原生高精度工业数据驱动，群脑智能协作，手眼脑毫米级精度。"
                   className="text-base md:text-xl text-gray-200 leading-relaxed max-w-3xl font-normal text-left"
                   duration={1.5}
                   as="p"
@@ -126,12 +128,14 @@ export default function RoboticPlusHomepageCn() {
             </div>
           </div>
         </div>
+      </section>
 
+      <section id="engine" className="relative min-h-screen">
         <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
             <img
               key={isMobile ? 'mobile-fullstack' : 'desktop-fullstack'}
-              src={isMobile ? `${import.meta.env.BASE_URL}HD_mobile_v2.png` : `${import.meta.env.BASE_URL}solutions.png`}
+              src={isMobile ? mobileSolutionsImageSrc : desktopSolutionsImageSrc}
               alt="Solutions Background"
               className="absolute left-0 top-0 w-full min-h-full opacity-100"
               style={{ objectFit: 'cover', objectPosition: 'center' }}
@@ -142,7 +146,7 @@ export default function RoboticPlusHomepageCn() {
             <div className="relative inline-block">
               <div className="absolute inset-0 -inset-x-8 -inset-y-6 bg-gradient-to-br from-black/80 via-black/70 to-black/80 rounded-3xl blur-2xl" />
               <div className="relative">
-                <Settings className="w-12 h-12 md:w-16 md:h-16 [color:#f5af15] mb-4 animate-pulse" />
+                <Brain className="w-12 h-12 md:w-16 md:h-16 [color:#f5af15] mb-4 animate-pulse" />
                 <BlurIn
                   word='全栈高端智能机器人装备，赋能大规模定制化行业'
                   className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-[#f5af15] to-white bg-clip-text text-transparent text-left"
@@ -161,7 +165,7 @@ export default function RoboticPlusHomepageCn() {
         </div>
       </section>
 
-      <section id="process-modules" className="relative min-h-screen flex items-center py-24 px-6 bg-black overflow-hidden">
+      <section id="solution" className="relative min-h-screen flex items-center py-24 px-6 bg-black overflow-hidden">
         <div className="absolute inset-0 z-0">
           <video
             src="https://stytqdpivnhmeozqdujr.supabase.co/storage/v1/object/public/videos/1773803906198-b49k3b.mp4"
@@ -315,7 +319,7 @@ export default function RoboticPlusHomepageCn() {
         </div>
       </section>
 
-      <section id="video-section-2" className="relative">
+      <section id="humanoid" className="relative">
         <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
             <video
@@ -412,8 +416,8 @@ export default function RoboticPlusHomepageCn() {
         </div>
       </section>
 
-      <section id="about" className="relative py-24 px-6 bg-black">
-        <div className="max-w-7xl mx-auto">
+      <section id="about" className="relative flex min-h-screen items-center px-6 py-24 bg-black">
+        <div className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">关于大界</h2>
             <div className="w-24 h-1 bg-gradient-to-r from-[#f5af15] to-[#f5af15] mx-auto rounded-full" />
@@ -546,25 +550,6 @@ export default function RoboticPlusHomepageCn() {
           </div>
         </div>
       </section>
-
-      <section id="contact" className="hidden"></section>
-
-      <footer className="relative py-8 px-6 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
-          <div className="flex items-center space-x-3 mb-4 md:mb-0">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#f5af15] to-[#f5af15] rounded-lg flex items-center justify-center">
-              <Cpu className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <p className="font-semibold">RoboticPlus.AI</p>
-              <p className="text-xs text-gray-500">大界</p>
-            </div>
-          </div>
-          <p className="text-gray-500 text-sm">
-            © 2024 RoboticPlus.AI. All rights reserved.
-          </p>
-        </div>
-      </footer>
 
       <button
         onClick={scrollToTop}
