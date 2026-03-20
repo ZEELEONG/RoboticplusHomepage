@@ -1,62 +1,99 @@
-import { useEffect, useState } from 'react';
-import { Cpu } from 'lucide-react';
-import TestTemplate from './pages/TestTemplate';
+import { useEffect, useMemo, useRef } from 'react';
 import RoboticPlusHomepageCn from './pages/RoboticPlusHomepageCn';
 import RoboticPlusHomepageEn from './pages/RoboticPlusHomepageEn';
 
-type Page = 'test-template' | 'roboticplus-homepage-cn' | 'roboticplus-homepage-en';
+type AppLanguage = 'cn' | 'en';
 
-function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('roboticplus-homepage-cn');
-  const [scrollY, setScrollY] = useState(0);
+const DESKTOP_BREAKPOINT = 1024;
+const SCROLL_LOCK_MS = 850;
+const DATA_SNAP_THRESHOLD = 0.98;
+const SECTION_IDS = ['home', 'data', 'engine', 'solution', 'humanoid', 'advantages', 'about', 'cooperation'] as const;
+
+function App({ language }: { language: AppLanguage }) {
+  const scrollLockRef = useRef(false);
+  const sectionIds = useMemo(() => [...SECTION_IDS], []);
 
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    const handleWheel = (event: WheelEvent) => {
+      if (window.innerWidth < DESKTOP_BREAKPOINT || scrollLockRef.current) {
+        return;
+      }
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrollY > 50 ? 'bg-slate-950/95 backdrop-blur-md shadow-lg' : 'bg-slate-950/80 backdrop-blur-sm'
-      }`}>
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            <img src="/180930_大界logo-04.png" alt="RoboticPlus.AI" className="w-10 h-10" />
-            <div>
-              <h1 className="text-xl font-bold">RoboticPlus.AI</h1>
-              <p className="text-xs text-gray-400">大界</p>
-            </div>
-          </div>
-          <div className="hidden md:flex space-x-8">
-            <button
-              onClick={() => setCurrentPage('roboticplus-homepage-cn')}
-              className={`transition-colors ${currentPage === 'roboticplus-homepage-cn' ? '[color:#f5af15]' : 'hover:[color:#f5af15]'}`}
-            >
-              大界官网草稿
-            </button>
-            <button
-              onClick={() => setCurrentPage('roboticplus-homepage-en')}
-              className={`transition-colors ${currentPage === 'roboticplus-homepage-en' ? '[color:#f5af15]' : 'hover:[color:#f5af15]'}`}
-            >
-              英文版
-            </button>
-            <button
-              onClick={() => setCurrentPage('test-template')}
-              className={`transition-colors ${currentPage === 'test-template' ? '[color:#f5af15]' : 'hover:[color:#f5af15]'}`}
-            >
-              测试模板
-            </button>
-          </div>
-        </div>
-      </nav>
+      const sections = sectionIds
+        .map((id) => document.getElementById(id))
+        .filter((section): section is HTMLElement => section !== null);
 
-      {currentPage === 'roboticplus-homepage-cn' && <RoboticPlusHomepageCn />}
-      {currentPage === 'roboticplus-homepage-en' && <RoboticPlusHomepageEn />}
-      {currentPage === 'test-template' && <TestTemplate />}
-    </div>
-  );
+      if (sections.length === 0) {
+        return;
+      }
+
+      const currentSectionIndex = sections.reduce((closestIndex, section, index) => {
+        const rect = section.getBoundingClientRect();
+        const closestSectionRect = sections[closestIndex].getBoundingClientRect();
+
+        if (Math.abs(rect.top) < Math.abs(closestSectionRect.top)) {
+          return index;
+        }
+
+        return closestIndex;
+      }, 0);
+
+      const direction = event.deltaY > 0 ? 1 : -1;
+      if (direction === 0) {
+        return;
+      }
+
+      const nextSection = sections[currentSectionIndex + direction];
+      if (!nextSection) {
+        return;
+      }
+
+      const currentSectionId = sectionIds[currentSectionIndex];
+      const nextSectionId = sectionIds[currentSectionIndex + direction];
+
+      if (currentSectionId === 'home' || nextSectionId === 'data') {
+        return;
+      }
+
+      if (currentSectionId === 'data' && direction > 0) {
+        const currentSection = sections[currentSectionIndex];
+        const sectionHeight = currentSection.offsetHeight;
+
+        if (sectionHeight > 0) {
+          const visibleProgress = Math.min(
+            Math.max(window.scrollY - currentSection.offsetTop + window.innerHeight, 0) /
+              sectionHeight,
+            1,
+          );
+
+          if (visibleProgress < DATA_SNAP_THRESHOLD) {
+            return;
+          }
+        }
+      }
+
+      event.preventDefault();
+      scrollLockRef.current = true;
+      nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      window.setTimeout(() => {
+        scrollLockRef.current = false;
+      }, SCROLL_LOCK_MS);
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      scrollLockRef.current = false;
+    };
+  }, [sectionIds]);
+
+  if (language === 'en') {
+    return <RoboticPlusHomepageEn />;
+  }
+
+  return <RoboticPlusHomepageCn />;
 }
 
 export default App;

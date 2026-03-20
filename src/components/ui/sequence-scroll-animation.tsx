@@ -3,25 +3,83 @@ import { useScroll, useTransform, motion, MotionValue } from "framer-motion";
 
 interface SequenceScrollProps {
   titleComponent: string | React.ReactNode;
-  frameCount: number;
-  frameBasePath: string;
-  frameStart?: number;
+  videoSrc: string;
 }
+
+const MIN_SEEK_DELTA = 0.01;
+const VIDEO_START_OFFSET = 0.12;
+const VIDEO_PROGRESS_RANGE = 0.72;
 
 export const SequenceScroll = ({
   titleComponent,
-  frameCount,
-  frameBasePath,
-  frameStart = 1000,
+  videoSrc,
 }: SequenceScrollProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const targetTimeRef = useRef(0);
+  const rafIdRef = useRef<number | null>(null);
+  const lastAppliedTimeRef = useRef<number | null>(null);
+  const hasInitializedFrameRef = useRef(false);
+  const hasShownVideoRef = useRef(false);
+  const durationRef = useRef(0);
   const { scrollYProgress } = useScroll({
     target: containerRef,
   });
   const [isMobile, setIsMobile] = useState(false);
-  const [images, setImages] = useState<HTMLImageElement[]>([]);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+
+  const clampTime = (time: number, maxDuration: number) => {
+    if (!Number.isFinite(time)) {
+      return 0;
+    }
+
+    return Math.min(Math.max(time, 0), maxDuration);
+  };
+
+  const getVideoProgress = (progress: number) => {
+    if (progress <= VIDEO_START_OFFSET) {
+      return 0;
+    }
+
+    return clampTime(
+      (progress - VIDEO_START_OFFSET) / VIDEO_PROGRESS_RANGE,
+      1,
+    );
+  };
+
+  const applyTargetTime = () => {
+    rafIdRef.current = null;
+
+    const video = videoRef.current;
+    const maxDuration = durationRef.current;
+
+    if (!video || maxDuration <= 0) {
+      return;
+    }
+
+    const nextTime = clampTime(targetTimeRef.current, maxDuration);
+    const lastAppliedTime = lastAppliedTimeRef.current;
+
+    if (
+      lastAppliedTime !== null &&
+      Math.abs(lastAppliedTime - nextTime) < MIN_SEEK_DELTA
+    ) {
+      return;
+    }
+
+    video.currentTime = nextTime;
+    lastAppliedTimeRef.current = nextTime;
+    hasInitializedFrameRef.current = true;
+  };
+
+  const scheduleApplyTargetTime = () => {
+    if (durationRef.current <= 0 || rafIdRef.current !== null) {
+      return;
+    }
+
+    rafIdRef.current = requestAnimationFrame(applyTargetTime);
+  };
 
   useEffect(() => {
     const checkMobile = () => {
@@ -35,67 +93,103 @@ export const SequenceScroll = ({
   }, []);
 
   useEffect(() => {
-    const loadImages = async () => {
-      const imagePromises: Promise<HTMLImageElement>[] = [];
+    setDuration(0);
+    setIsVideoReady(false);
+    durationRef.current = 0;
+    targetTimeRef.current = 0;
+    lastAppliedTimeRef.current = null;
+    hasInitializedFrameRef.current = false;
+    hasShownVideoRef.current = false;
 
-      for (let i = 0; i < frameCount; i++) {
-        const img = new Image();
-        const frameNumber = frameStart + i;
-        img.src = `${frameBasePath}/hero_ipad_${frameNumber}.png`;
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
 
-        const promise = new Promise<HTMLImageElement>((resolve, reject) => {
-          img.onload = () => resolve(img);
-          img.onerror = reject;
-        });
+    const video = videoRef.current;
+    if (!video) return;
 
-        imagePromises.push(promise);
+    const syncTargetTimeWithProgress = (progress: number) => {
+      const maxDuration = durationRef.current;
+      if (maxDuration <= 0) {
+        return;
       }
 
-      try {
-        const loadedImages = await Promise.all(imagePromises);
-        setImages(loadedImages);
-        setImagesLoaded(true);
-      } catch (error) {
-        console.error("Error loading images:", error);
+      targetTimeRef.current = clampTime(
+        getVideoProgress(progress) * maxDuration,
+        maxDuration,
+      );
+      scheduleApplyTargetTime();
+    };
+
+    const handleLoadedMetadata = () => {
+      if (!Number.isFinite(video.duration) || video.duration <= 0) {
+        return;
+      }
+
+      durationRef.current = video.duration;
+      setDuration(video.duration);
+      syncTargetTimeWithProgress(scrollYProgress.get());
+    };
+
+    const handleLoadedData = () => {
+      if (!hasInitializedFrameRef.current) {
+        syncTargetTimeWithProgress(scrollYProgress.get());
+      }
+
+      if (!hasShownVideoRef.current) {
+        hasShownVideoRef.current = true;
+        setIsVideoReady(true);
       }
     };
 
-    loadImages();
-  }, [frameCount, frameBasePath, frameStart]);
+    const handleError = () => {
+      setIsVideoReady(false);
+      setDuration(0);
+      durationRef.current = 0;
+      hasInitializedFrameRef.current = false;
+      hasShownVideoRef.current = false;
+    };
+
+    video.addEventListener("loadedmetadata", handleLoadedMetadata);
+    video.addEventListener("loadeddata", handleLoadedData);
+    video.addEventListener("error", handleError);
+
+    return () => {
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      video.removeEventListener("loadeddata", handleLoadedData);
+      video.removeEventListener("error", handleError);
+
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+    };
+  }, [videoSrc, scrollYProgress]);
 
   useEffect(() => {
-    if (!imagesLoaded || images.length === 0) return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const context = canvas.getContext("2d");
-    if (!context) return;
+    durationRef.current = duration;
 
     const unsubscribe = scrollYProgress.on("change", (latest) => {
-      const frameIndex = Math.min(
-        Math.floor(latest * frameCount),
-        frameCount - 1
-      );
+      const maxDuration = durationRef.current;
+      if (maxDuration <= 0) return;
 
-      const img = images[frameIndex];
-      if (img && img.complete) {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(img, 0, 0);
-      }
+      targetTimeRef.current = clampTime(
+        getVideoProgress(latest) * maxDuration,
+        maxDuration,
+      );
+      scheduleApplyTargetTime();
     });
 
-    const firstImage = images[0];
-    if (firstImage && firstImage.complete) {
-      canvas.width = firstImage.width;
-      canvas.height = firstImage.height;
-      context.drawImage(firstImage, 0, 0);
-    }
+    return () => {
+      unsubscribe();
 
-    return () => unsubscribe();
-  }, [scrollYProgress, images, imagesLoaded, frameCount]);
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+    };
+  }, [scrollYProgress, duration]);
 
   const scaleDimensions = () => {
     return isMobile ? [0.7, 0.9] : [1.05, 1];
@@ -118,14 +212,18 @@ export const SequenceScroll = ({
       >
         <Header translate={translate} titleComponent={titleComponent} />
         <Card rotate={rotate} translate={translate} scale={scale}>
-          <canvas
-            ref={canvasRef}
+          <video
+            ref={videoRef}
+            src={videoSrc}
+            muted
+            playsInline
+            preload="auto"
             className="w-full h-full object-cover rounded-2xl"
             style={{
-              display: imagesLoaded ? "block" : "none",
+              display: isVideoReady ? "block" : "none",
             }}
           />
-          {!imagesLoaded && (
+          {!isVideoReady && (
             <div className="w-full h-full flex items-center justify-center bg-slate-800">
               <div className="text-white text-lg">加载中...</div>
             </div>
